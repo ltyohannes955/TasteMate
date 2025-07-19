@@ -1,6 +1,13 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
-import { Calendar, Home, Menu, Search } from "lucide-react-native";
+import {
+  Clapperboard,
+  Film,
+  Heart,
+  Popcorn,
+  Search,
+  Shapes,
+} from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 function MyTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
@@ -21,12 +28,14 @@ function MyTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
         const Icon =
           route.name === "home/index"
-            ? Home
-            : route.name === "search/index"
-              ? Search
-              : route.name === "plan/index"
-                ? Calendar
-                : Menu;
+            ? Film
+            : route.name === "movies/index"
+              ? Popcorn
+              : route.name === "category/index"
+                ? Shapes
+                : route.name === "tvShows/index"
+                  ? Clapperboard
+                  : Heart;
 
         return (
           <Pressable
@@ -57,7 +66,6 @@ export default function TabLayout() {
       tabBar={(props) => <MyTabBar {...props} />}
       screenOptions={{
         headerShown: true,
-        headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: "#181110", // match your tab bar
         },
@@ -73,24 +81,31 @@ export default function TabLayout() {
         name="home/index"
         options={{
           title: "Home",
+          headerRight: () => <Search color="white" />,
         }}
       />
       <Tabs.Screen
-        name="search/index"
+        name="category/index"
         options={{
-          title: "Discover",
+          title: "Category",
         }}
       />
       <Tabs.Screen
-        name="plan/index"
+        name="movies/index"
         options={{
-          title: "Plan",
+          title: "Movies",
         }}
       />
       <Tabs.Screen
-        name="more/index"
+        name="tvShows/index"
         options={{
-          title: "More",
+          title: "Tv Shows",
+        }}
+      />
+      <Tabs.Screen
+        name="favorite/index"
+        options={{
+          title: "Favorite",
         }}
       />
     </Tabs>
