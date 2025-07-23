@@ -2,6 +2,7 @@ import { Heart } from "lucide-react-native";
 import React, { useRef, useState } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Image,
@@ -9,53 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useGetPopularMoviesQuery } from "../../services/movieApi";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7;
 const CARD_HEIGHT = 380;
-
-const movieData = [
-  {
-    id: 1,
-    title: "Inception",
-    rating: "8.8",
-    image:
-      "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
-    description:
-      "A skilled thief steals corporate secrets using dream-sharing technology.",
-  },
-  {
-    id: 2,
-    title: "Interstellar",
-    rating: "8.6",
-    image: "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-    description:
-      "A team travels through a wormhole in space to ensure humanity's survival.",
-  },
-  {
-    id: 3,
-    title: "The Dark Knight",
-    rating: "9.0",
-    image: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-    description:
-      "Batman faces off against the Joker, Gotham’s most dangerous criminal.",
-  },
-  {
-    id: 4,
-    title: "The Matrix",
-    rating: "8.7",
-    image: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-    description:
-      "A hacker learns the truth about reality and joins the rebellion.",
-  },
-  {
-    id: 5,
-    title: "Parasite",
-    rating: "8.5",
-    image: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
-    description: "A poor family schemes to infiltrate a wealthy household.",
-  },
-];
 
 export default function MovieSlider() {
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -72,6 +31,13 @@ export default function MovieSlider() {
       },
     }
   );
+  const { data, error, isLoading } = useGetPopularMoviesQuery();
+
+  if (isLoading) return <ActivityIndicator size="large" />;
+
+  if (error) return <Text>Error fetching data</Text>;
+
+  const movieData = data?.results.slice(0, 6) || [];
 
   return (
     <View className="items-center h-[410px]">
@@ -117,7 +83,9 @@ export default function MovieSlider() {
               className="rounded-2xl overflow-hidden"
             >
               <Image
-                source={{ uri: item.image }}
+                source={{
+                  uri: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+                }}
                 className="absolute w-full h-full"
                 resizeMode="cover"
               />
@@ -135,13 +103,13 @@ export default function MovieSlider() {
               {/* Overlay content */}
               <View className="flex-1 bg-black/50 p-4 justify-end">
                 <Text className="text-white text-lg font-bold mb-1">
-                  {item.title}
+                  {item.original_title}
                 </Text>
                 <Text className="text-[#ffcc00] text-sm mb-1">
-                  ⭐ {item.rating}
+                  ⭐ {item.vote_average}
                 </Text>
                 <Text className="text-[#ddd] text-xs" numberOfLines={2}>
-                  {item.description}
+                  {item.overview}
                 </Text>
               </View>
             </Animated.View>
@@ -151,7 +119,7 @@ export default function MovieSlider() {
 
       {/* Pagination Dots */}
       <View className="flex-row justify-center mt-4 gap-2">
-        {movieData.map((_, i) => (
+        {movieData.map((_: any, i: any) => (
           <View
             key={i}
             className={`w-3 h-3 rounded-full ${
